@@ -133,6 +133,20 @@ with left_col:
     allow_wastage = st.checkbox("Allow 15% wastage", value=True,
                               help="Add 15% extra to account for wastage during application")
 
+    # Display joint profile information
+    if profile_name != "Custom":
+        profile = JOINT_PROFILES[profile_name]
+        with st.expander("Joint Profile Details"):
+            st.write(f"**Description:** {profile.description}")
+            st.write(f"**Typical Dimensions:**")
+            st.write(f"- Width: {profile.typical_width} cm")
+            st.write(f"- Depth: {profile.typical_depth} cm")
+            st.write(f"**Formula:**")
+            st.code(profile.formula)
+            if profile.notes:
+                st.write(f"**Notes:**")
+                st.write(profile.notes)
+
 with right_col:
     # Display joint diagram
     st.subheader("Joint Profile Diagram")

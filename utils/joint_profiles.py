@@ -8,6 +8,8 @@ class JointProfile:
     typical_depth: float
     description: str
     diagram_path: str
+    formula: str
+    notes: str = ""
 
 # Define common joint profiles
 JOINT_PROFILES = {
@@ -16,35 +18,45 @@ JOINT_PROFILES = {
         typical_width=1.0,
         typical_depth=1.0,
         description="Standard square profile, equal width and depth",
-        diagram_path="assets/square_joint.png"
+        diagram_path="assets/square_joint.png",
+        formula="Volume (L) = Width (cm) × Depth (cm) × Length (cm) ÷ 1000",
+        notes="Most common profile. Use backing rod if depth > 10mm"
     ),
     "Deep Joint": JointProfile(
         name="Deep Joint",
         typical_width=1.0,
         typical_depth=2.0,
         description="Deep profile, depth greater than width",
-        diagram_path="assets/deep_joint.png"
+        diagram_path="assets/deep_joint.png",
+        formula="Volume (L) = Width (cm) × Depth (cm) × Length (cm) ÷ 1000\nRecommended: Depth = Width × 2",
+        notes="Requires backing rod. Add 10% for material settling"
     ),
     "Wide Joint": JointProfile(
         name="Wide Joint",
         typical_width=2.0,
         typical_depth=1.0,
         description="Wide profile, width greater than depth",
-        diagram_path="assets/wide_joint.png"
+        diagram_path="assets/wide_joint.png",
+        formula="Volume (L) = Width (cm) × Depth (cm) × Length (cm) ÷ 1000\nRecommended: Depth = Width ÷ 2",
+        notes="May require multiple passes. Consider joint movement"
     ),
     "V-Joint": JointProfile(
         name="V-Joint",
         typical_width=1.0,
         typical_depth=1.5,
         description="V-shaped profile, commonly used in corners",
-        diagram_path="assets/v_joint.png"
+        diagram_path="assets/v_joint.png",
+        formula="Volume (L) = (Width (cm) × Depth (cm) × Length (cm)) ÷ 2000",
+        notes="Use half of square joint volume due to triangular profile"
     ),
     "U-Joint": JointProfile(
         name="U-Joint",
         typical_width=1.5,
         typical_depth=1.5,
         description="U-shaped profile, rounded bottom",
-        diagram_path="assets/u_joint.png"
+        diagram_path="assets/u_joint.png",
+        formula="Volume (L) = (π × Width (cm) × Depth (cm) × Length (cm)) ÷ 4000",
+        notes="Accounts for rounded bottom. Add 15% for curvature filling"
     )
 }
 
