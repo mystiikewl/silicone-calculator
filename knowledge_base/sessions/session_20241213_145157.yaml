@@ -1,0 +1,17 @@
+inputs:
+  allow_wastage: false
+  depth: 3.0
+  length: 600.0
+  package_type: Cartridge (300ml)
+  profile: Square Joint
+  unit: cm
+  width: 3.0
+results:
+  base_volume: 5.4
+  final_volume: 5.4
+  full_packages: 18
+  packages_needed: 18.0
+  partial_package: 0.0
+  volume_ml: 5400.0
+timestamp: '2024-12-13T14:51:57.542771'
+type: calculation

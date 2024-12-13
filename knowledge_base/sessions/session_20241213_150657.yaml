@@ -1,0 +1,17 @@
+inputs:
+  allow_wastage: false
+  depth: 1.5
+  length: 600.0
+  package_type: Sausage (600ml)
+  profile: V-Joint
+  unit: cm
+  width: 1.0
+results:
+  base_volume: 0.9
+  final_volume: 0.9
+  full_packages: 1
+  packages_needed: 1.5
+  partial_package: 0.5
+  volume_ml: 900.0
+timestamp: '2024-12-13T15:06:57.616283'
+type: calculation
