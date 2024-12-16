@@ -23,8 +23,8 @@ class JointProfile:
 JOINT_PROFILES = {
     "Square Joint": JointProfile(
         name="Square Joint",
-        typical_width=1.0,
-        typical_depth=0.5,  # Following 2:1 ratio
+        typical_width=12.0,
+        typical_depth=6.0,  # Following 2:1 ratio
         description="Standard square profile, width twice the depth (2:1 ratio)",
         diagram_path="assets/square_joint.png",
         formula="Volume (L) = Width (cm) × Depth (cm) × Length (m) × 100 ÷ 1000",
@@ -32,8 +32,8 @@ JOINT_PROFILES = {
     ),
     "Deep Joint": JointProfile(
         name="Deep Joint",
-        typical_width=1.0,
-        typical_depth=1.0,  # Equal width and depth
+        typical_width=20.0,
+        typical_depth=20.0,  # Equal width and depth (1:1 ratio)
         description="Deep profile, equal width and depth (1:1 ratio)",
         diagram_path="assets/deep_joint.png",
         formula="Volume (L) = Width (cm) × Depth (cm) × Length (m) × 100 ÷ 1000",
@@ -41,17 +41,17 @@ JOINT_PROFILES = {
     ),
     "Wide Joint": JointProfile(
         name="Wide Joint",
-        typical_width=2.0,
-        typical_depth=1.0,  # Following 2:1 ratio
+        typical_width=30.0,
+        typical_depth=12.0,  # Following 2:1 ratio
         description="Wide profile, width twice the depth (2:1 ratio)",
         diagram_path="assets/wide_joint.png",
         formula="Volume (L) = Width (cm) × Depth (cm) × Length (m) × 100 ÷ 1000",
-        notes="May require multiple passes. Depth should not exceed width for proper adhesion."
+        notes="May require multiple passes. Depth should not exceed half the width for proper adhesion."
     ),
     "V-Joint": JointProfile(
         name="V-Joint",
-        typical_width=1.5,
-        typical_depth=1.0,  # Following 1.5:1 ratio
+        typical_width=15.0,
+        typical_depth=10.0,  # Following 1.5:1 ratio
         description="V-shaped profile for corner applications (1.5:1 ratio)",
         diagram_path="assets/v_joint.png",
         formula="Volume (L) = Width (cm) × Depth (cm) × Length (m) × 100 ÷ 2000",  # Half volume due to triangular profile
@@ -59,53 +59,8 @@ JOINT_PROFILES = {
     ),
     "U-Joint": JointProfile(
         name="U-Joint",
-        typical_width=1.5,
-        typical_depth=1.0,  # Following 1.5:1 ratio
-        description="U-shaped profile for enhanced movement (1.5:1 ratio)",
-        diagram_path="assets/u_joint.png",
-        formula="Volume (L) = Width (cm) × Depth (cm) × Length (m) × 100 ÷ 1000",
-        notes="Suitable for expansion joints. Requires special tooling for U-shape formation."
-    ),
-    "Square Joint": JointProfile(
-        name="Square Joint",
-        typical_width=1.0,
-        typical_depth=0.5,  # Following 2:1 ratio
-        description="Standard square profile, width twice the depth (2:1 ratio)",
-        diagram_path="assets/square_joint.png",
-        formula="Volume (L) = Width (cm) × Depth (cm) × Length (m) × 100 ÷ 1000",
-        notes="Most common profile. Use backing rod if depth > 10mm. Ideal width-to-depth ratio is 2:1."
-    ),
-    "Deep Joint": JointProfile(
-        name="Deep Joint",
-        typical_width=1.0,
-        typical_depth=1.0,  # Equal width and depth
-        description="Deep profile, equal width and depth (1:1 ratio)",
-        diagram_path="assets/deep_joint.png",
-        formula="Volume (L) = Width (cm) × Depth (cm) × Length (m) × 100 ÷ 1000",
-        notes="Requires backing rod. Ideal for joints with limited width but requiring good depth."
-    ),
-    "Wide Joint": JointProfile(
-        name="Wide Joint",
-        typical_width=2.0,
-        typical_depth=1.0,  # Following 2:1 ratio
-        description="Wide profile, width twice the depth (2:1 ratio)",
-        diagram_path="assets/wide_joint.png",
-        formula="Volume (L) = Width (cm) × Depth (cm) × Length (m) × 100 ÷ 1000",
-        notes="May require multiple passes. Depth should not exceed width for proper adhesion."
-    ),
-    "V-Joint": JointProfile(
-        name="V-Joint",
-        typical_width=1.5,
-        typical_depth=1.0,  # Following 1.5:1 ratio
-        description="V-shaped profile for corner applications (1.5:1 ratio)",
-        diagram_path="assets/v_joint.png",
-        formula="Volume (L) = Width (cm) × Depth (cm) × Length (m) × 100 ÷ 2000",  # Half volume due to triangular profile
-        notes="Ideal for corner applications. Volume is half of square joint due to triangular profile."
-    ),
-    "U-Joint": JointProfile(
-        name="U-Joint",
-        typical_width=1.5,
-        typical_depth=1.0,  # Following 1.5:1 ratio
+        typical_width=15.0,
+        typical_depth=10.0,  # Following 1.5:1 ratio
         description="U-shaped profile for enhanced movement (1.5:1 ratio)",
         diagram_path="assets/u_joint.png",
         formula="Volume (L) = Width (cm) × Depth (cm) × Length (m) × 100 ÷ 1000",
@@ -177,8 +132,8 @@ class JointValidator:
         },
         "Wide Joint": {
             "width_to_depth_ratio": 2.0,  # 2:1 ratio (width:depth)
-            "min_width_mm": 12,
-            "max_width_mm": 24,
+            "min_width_mm": 25,
+            "max_width_mm": 50,
             "min_depth_mm": 6,
             "max_depth_mm": 12,
             "ratio_tolerance": 0.3  # More tolerance for wide joints

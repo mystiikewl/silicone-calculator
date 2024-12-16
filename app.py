@@ -138,11 +138,11 @@ with left_col:
         
         # Profile-specific descriptions
         profile_descriptions = {
-            "Square Joint": "Standard profile with equal sides, ideal for most applications. Uses the common 2:1 width-to-depth ratio.",
-            "Deep Joint": "Specialized profile for gaps requiring extra depth. Uses 1:1 ratio to ensure proper curing and adhesion.",
-            "Wide Joint": "Designed for wide gaps, using 3:1 ratio to maintain flexibility while covering larger areas.",
-            "V-Joint": "Angular profile for corner applications, using 1.5:1 ratio to account for the V-shaped gap.",
-            "U-Joint": "Rounded profile with 1.5:1 ratio, ideal for curved or rounded gap applications."
+            "Square Joint": "Standard profile with width twice the depth (2:1 ratio), providing optimal balance between movement capability and material usage.",
+            "Deep Joint": "Deep profile with equal width and depth (1:1 ratio), ideal for joints with limited width but requiring good depth.",
+            "Wide Joint": "Wide profile with width twice the depth (2:1 ratio), suitable for larger gaps requiring multiple passes.",
+            "V-Joint": "V-shaped profile for corner applications (1.5:1 ratio), uses half the volume of a square joint due to triangular profile.",
+            "U-Joint": "U-shaped profile with enhanced movement capability (1.5:1 ratio), requires special tooling for proper formation."
         }
         
         st.markdown(f"""
@@ -156,122 +156,69 @@ with left_col:
         - **Tolerance**: ±{int(profile_specs['ratio_tolerance']*100)}% from ideal ratio
         
         #### Profile-Specific Considerations
-        1. **Movement Capability**: {
-            "Excellent" if profile_specs['width_to_depth_ratio'] >= 2 else 
-            "Good" if profile_specs['width_to_depth_ratio'] >= 1.5 else 
-            "Moderate"} flexibility
-        2. **Material Usage**: {
-            "Efficient" if profile_specs['width_to_depth_ratio'] >= 2 else 
-            "Moderate" if profile_specs['width_to_depth_ratio'] >= 1.5 else 
-            "Higher"} material consumption
-        3. **Application Complexity**: {
-            "Simple" if profile_name == "Square Joint" else
-            "Moderate" if profile_name in ["V-Joint", "Wide Joint"] else
-            "Complex"} installation process
-        4. **Typical Applications**:
-           - {
-            "General purpose sealing" if profile_name == "Square Joint" else
-            "Deep gap filling" if profile_name == "Deep Joint" else
-            "Large expansion joints" if profile_name == "Wide Joint" else
-            "Corner joints and angles" if profile_name == "V-Joint" else
-            "Curved surfaces and rounded gaps" if profile_name == "U-Joint" else
-            "Custom applications"}
-           - {
-            "Interior and exterior use" if profile_name == "Square Joint" else
-            "Structural joints" if profile_name == "Deep Joint" else
-            "Facade joints" if profile_name == "Wide Joint" else
-            "Wall-floor junctions" if profile_name == "V-Joint" else
-            "Pipe penetrations" if profile_name == "U-Joint" else
-            "Specialized uses"}
+        1. **Typical Applications**:
+           - {"Most common profile type, ideal for general sealing applications" if profile_name == "Square Joint" else
+              "Requires backing rod, ideal for joints with limited width but requiring good depth" if profile_name == "Deep Joint" else
+              "Suitable for larger gaps, may require multiple application passes" if profile_name == "Wide Joint" else
+              "Ideal for corner applications, good for joints with angular movement" if profile_name == "V-Joint" else
+              "Suitable for expansion joints, excellent for accommodating multi-directional movement" if profile_name == "U-Joint" else
+              "Custom applications"}
+           
+        2. **Installation Notes**:
+           - {"Use backing rod if depth exceeds 10mm" if profile_name == "Square Joint" else
+              "Always use backing rod" if profile_name == "Deep Joint" else
+              "Depth should not exceed half the width for proper adhesion" if profile_name == "Wide Joint" else
+              "Tooling is critical for proper shape formation" if profile_name == "V-Joint" else
+              "Requires special tooling for U-shape formation" if profile_name == "U-Joint" else
+              "Follow manufacturer guidelines"}
+
+        3. **Volume Considerations**:
+           - {"Standard volume calculation" if profile_name == "Square Joint" else
+              "Standard volume calculation" if profile_name == "Deep Joint" else
+              "Consider multiple passes for large gaps" if profile_name == "Wide Joint" else
+              "Volume is approximately half of a square joint due to triangular profile" if profile_name == "V-Joint" else
+              "Additional material needed for curved profile" if profile_name == "U-Joint" else
+              "Calculate based on specific requirements"}
         
-        #### Why These Specifications Matter
-        1. **Proper Movement**: {
-            "Optimal flexibility for standard movement" if profile_name == "Square Joint" else
-            "Enhanced depth for structural movement" if profile_name == "Deep Joint" else
-            "Maximum coverage with maintained flexibility" if profile_name == "Wide Joint" else
-            "Angular movement accommodation" if profile_name == "V-Joint" else
-            "Rounded movement capability" if profile_name == "U-Joint" else
-            "Custom movement requirements"}
-        2. **Material Efficiency**: Dimensions optimized for {profile_specs['width_to_depth_ratio']}:1 ratio
-        3. **Better Adhesion**: Profile design prevents three-sided adhesion
-        4. **Durability**: Specifications ensure long-term performance
+        #### Joint Ratio Examples
         """)
         
-        # Visual representation using columns
-        st.markdown("### Visual Guide: Ideal Joint Ratio")
-        col1, col2 = st.columns([1, 1])
-        
-        ideal_width = (profile_specs['min_width_mm'] + profile_specs['max_width_mm']) / 2
-        ideal_depth = ideal_width / profile_specs['width_to_depth_ratio']
-        
-        with col1:
-            st.markdown(f"""
-            ```
-            Correct ({profile_specs['width_to_depth_ratio']}:1 Ratio)
-            
-            ┌──────────────┐
-            │              │
-            │   Width      │ {ideal_width:.0f}mm
-            │    ↔         │
-            │              │
-            │   Depth      │ {ideal_depth:.0f}mm
-            │    ↕         │
-            └──────────────┘
-            ```
-            ✅ Proper movement
-            ✅ Good adhesion
+        if profile_name == "Square Joint":
+            st.markdown("""
+            | Correct Ratio | Incorrect Ratio |
+            |---|---|
+            | 12mm wide x 6mm deep | 10mm wide x 10mm deep |
+            | 20mm wide x 10mm deep | 30mm wide x 10mm deep |
             """)
-            
-        with col2:
-            st.markdown(f"""
-            ```
-            Incorrect (1:1 Ratio)
-            
-            ┌──────────────┐
-            │              │
-            │   Width      │ {ideal_width:.0f}mm
-            │    ↔         │
-            │              │
-            │   Depth      │ {ideal_width:.0f}mm
-            │    ↕         │
-            └──────────────┘
-            ```
-            ❌ Limited movement
-            ❌ Risk of adhesion failure
+        elif profile_name == "Wide Joint":
+            st.markdown("""
+            | Correct Ratio | Incorrect Ratio |
+            |---|---|
+            | 30mm wide x 12mm deep | 30mm wide x 20mm deep |
+            | 40mm wide x 12mm deep | 50mm wide x 10mm deep |
             """)
+        elif profile_name == "Deep Joint":
+            st.markdown("""
+            | Correct Ratio | Incorrect Ratio |
+            |---|---|
+            | 20mm wide x 20mm deep | 10mm wide x 20mm deep |
+            | 15mm wide x 18mm deep | 30mm wide x 40mm deep |
+            """)
+        elif profile_name == "V-Joint":
+            st.markdown("""
+            | Correct Ratio | Incorrect Ratio |
+            |---|---|
+            | 15mm wide x 10mm deep | 10mm wide x 10mm deep |
+            | 20mm wide x 12mm deep | 30mm wide x 10mm deep |
+            """)
+        elif profile_name == "U-Joint":
+            st.markdown("*Due to the complexity of U-shaped joints, specific dimension recommendations are highly application-specific.*")
+        else:
+            st.markdown("*Custom profile dimensions should be based on specific project requirements.*")
         
-        # Visual representation using columns
-        # st.markdown("### Visual Guide: Ideal Joint Ratio")
-        # col1, col2 = st.columns([1, 1])
+        # Add visual separator
+        st.markdown("---")
         
-        # with col1:
-        #     st.markdown("Correct (2:1 Ratio)")
-        #     st.code("""
-        # ┌─────────┐
-        # │         │
-        # │  Width  │ 13mm
-        # │    ↔    │
-        # │         │
-        # │  Depth  │ 6.5mm
-        # │    ↕    │
-        # └─────────┘
-        # """)
-        #     st.markdown("✅ Proper movement  ✅ Good adhesion")
-            
-        # with col2:
-        #     st.markdown("Incorrect (1:1 Ratio)")
-        #     st.code("""
-        # ┌─────────┐
-        # │         │
-        # │  Width  │ 13mm
-        # │    ↔    │
-        # │         │
-        # │  Depth  │ 13mm
-        # │    ↕    │
-        # └─────────┘
-        # """)
-        #     st.markdown("❌ Limited movement  ❌ Risk of adhesion failure")
-
     # Convert measurements for validation
     width_mm = UnitConverter.cm_to_mm(width_cm) if selected_unit == "cm" else width
     depth_mm = UnitConverter.cm_to_mm(depth_cm) if selected_unit == "cm" else depth
