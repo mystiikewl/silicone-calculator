@@ -236,14 +236,14 @@ with left_col:
             """)
 
     # Convert measurements for validation
-    width_mm = UnitConverter.cm_to_mm(width_cm)
-    depth_mm = UnitConverter.cm_to_mm(depth_cm)
+    width_mm = UnitConverter.cm_to_mm(width_cm) if selected_unit == "cm" else width
+    depth_mm = UnitConverter.cm_to_mm(depth_cm) if selected_unit == "cm" else depth
     
     # Get recommendations
     recommendations = JointValidator.get_recommended_dimensions(width_mm=width_mm, depth_mm=depth_mm, profile_name=profile_name)
     
     # Validate dimensions with profile
-    validation = JointValidator.validate_dimensions(width_mm, depth_mm, profile_name)
+    validation = JointValidator.validate_dimensions(width_mm, depth_mm, profile_name, unit=selected_unit)
     
     # Show recommendations before calculation
     if validation["recommendations"]:
@@ -264,7 +264,8 @@ with left_col:
                 else recommendations["recommended_depth"]
             )
             if st.button(f"Use Recommended Depth ({recommended_value:.1f} {selected_unit})"):
-                depth = recommended_value
+                st.session_state.depth = recommended_value
+                st.experimental_rerun()
     
     with rec_col2:
         if recommendations["recommended_width"] is not None:
@@ -274,7 +275,8 @@ with left_col:
                 else recommendations["recommended_width"]
             )
             if st.button(f"Use Recommended Width ({recommended_value:.1f} {selected_unit})"):
-                width = recommended_value
+                st.session_state.width = recommended_value
+                st.experimental_rerun()
 
     # Wastage checkbox
     allow_wastage = st.checkbox("Allow 15% wastage", value=True,
