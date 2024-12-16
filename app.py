@@ -123,6 +123,46 @@ with left_col:
     # Length is already in meters, convert to cm for volume calculation
     length_cm = UnitConverter.m_to_cm(length)
 
+    # Add joint specification guide
+    with st.expander("Joint Specifications Guide"):
+        st.markdown("""
+        ### Joint Dimension Guidelines
+        - **Width Range**: 6mm - 24mm
+        - **Depth Range**: 6mm - 12mm
+        - **Ideal Ratio**: Width:Depth = 2:1
+        
+        #### Why These Specifications Matter
+        1. **Proper Movement**: Correct depth allows the sealant to flex properly
+        2. **Material Efficiency**: Optimal depth reduces material waste
+        3. **Better Adhesion**: Prevents three-sided adhesion which can cause failure
+        4. **Durability**: Correct ratio ensures long-term performance
+        """)
+        
+        st.image("assets/joint_ratio_diagram.png", caption="Ideal Joint Ratio Diagram", use_column_width=True)
+
+    # Convert measurements for validation
+    width_mm = UnitConverter.cm_to_mm(width_cm)
+    depth_mm = UnitConverter.cm_to_mm(depth_cm)
+    
+    # Validate dimensions
+    validation = JointValidator.validate_dimensions(width_mm, depth_mm)
+    
+    # Show recommendations before calculation
+    if validation["recommendations"]:
+        st.info("📏 " + "\n".join(validation["recommendations"]))
+    
+    # Show warnings if dimensions are not ideal
+    if validation["warnings"]:
+        st.warning("⚠️ " + "\n".join(validation["warnings"]))
+        
+    # Auto-suggest depth based on width
+    recommended_depth_mm = JointValidator.get_recommended_depth(width_mm)
+    if st.button("Use Recommended Depth"):
+        if selected_unit == "mm":
+            depth = recommended_depth_mm
+        else:  # cm
+            depth = UnitConverter.mm_to_cm(recommended_depth_mm)
+
     # Wastage checkbox
     allow_wastage = st.checkbox("Allow 15% wastage", value=True,
                               help="Add 15% extra to account for wastage during application")

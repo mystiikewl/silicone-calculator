@@ -96,3 +96,56 @@ class UnitConverter:
         elif to_unit == "m":
             return UnitConverter.cm_to_m(value)
         return value  # cm
+
+class JointValidator:
+    MIN_DEPTH_MM = 6  # minimum 6mm depth
+    MAX_DEPTH_MM = 12  # maximum 12mm depth
+    MIN_WIDTH_MM = 6  # minimum 6mm width
+    MAX_WIDTH_MM = 24  # maximum 24mm width
+    
+    @staticmethod
+    def get_recommended_depth(width_mm: float) -> float:
+        """Calculate recommended depth based on width (2:1 ratio)."""
+        recommended = width_mm / 2
+        return max(JointValidator.MIN_DEPTH_MM, 
+                  min(recommended, JointValidator.MAX_DEPTH_MM))
+    
+    @staticmethod
+    def validate_dimensions(width_mm: float, depth_mm: float) -> dict:
+        """Validate joint dimensions and return status with messages."""
+        status = {
+            "is_valid": True,
+            "warnings": [],
+            "recommendations": []
+        }
+        
+        # Check width limits
+        if width_mm < JointValidator.MIN_WIDTH_MM:
+            status["warnings"].append(f"Width ({width_mm}mm) is below minimum recommended width ({JointValidator.MIN_WIDTH_MM}mm)")
+            status["is_valid"] = False
+        elif width_mm > JointValidator.MAX_WIDTH_MM:
+            status["warnings"].append(f"Width ({width_mm}mm) exceeds maximum recommended width ({JointValidator.MAX_WIDTH_MM}mm)")
+            status["is_valid"] = False
+            
+        # Check depth limits
+        if depth_mm < JointValidator.MIN_DEPTH_MM:
+            status["warnings"].append(f"Depth ({depth_mm}mm) is below minimum recommended depth ({JointValidator.MIN_DEPTH_MM}mm)")
+            status["is_valid"] = False
+        elif depth_mm > JointValidator.MAX_DEPTH_MM:
+            status["warnings"].append(f"Depth ({depth_mm}mm) exceeds maximum recommended depth ({JointValidator.MAX_DEPTH_MM}mm)")
+            status["is_valid"] = False
+            
+        # Check width-to-depth ratio
+        recommended_depth = JointValidator.get_recommended_depth(width_mm)
+        ratio = width_mm / depth_mm if depth_mm > 0 else float('inf')
+        
+        if abs(depth_mm - recommended_depth) > 1:  # 1mm tolerance
+            status["recommendations"].append(
+                f"Recommended depth for {width_mm}mm width is {recommended_depth}mm (2:1 width-to-depth ratio)"
+            )
+            if ratio < 1.5:  # Too deep relative to width
+                status["warnings"].append("Joint is too deep relative to width. This may cause adhesion failure.")
+            elif ratio > 2.5:  # Too shallow relative to width
+                status["warnings"].append("Joint is too shallow relative to width. This may affect movement capability.")
+                
+        return status
