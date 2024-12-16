@@ -63,6 +63,12 @@ with left_col:
         - Always check manufacturer recommendations for your specific application
         """)
 
+    # Initialize session state for measurements
+    if 'width' not in st.session_state:
+        st.session_state.width = None
+    if 'depth' not in st.session_state:
+        st.session_state.depth = None
+
     # Joint profile selection
     st.subheader("1. Select Joint Profile")
     profile_name = st.selectbox(
@@ -74,29 +80,26 @@ with left_col:
     unit_options = ["mm", "cm"]
     selected_unit = st.selectbox("Width/Depth Unit:", unit_options, index=1)
 
+    # Use session state values if they exist, otherwise use defaults
+    default_width = st.session_state.width if st.session_state.width is not None else (1.0 if selected_unit == "cm" else 10.0)
+    default_depth = st.session_state.depth if st.session_state.depth is not None else (1.0 if selected_unit == "cm" else 10.0)
+
     # Input fields with unit conversion
     st.subheader("2. Enter Measurements")
     col1, col2, col3, col4 = st.columns(4)
 
-    # Get default values from profile
-    if profile_name != "Custom":
-        profile = JOINT_PROFILES[profile_name]
-        default_width = profile.typical_width
-        default_depth = profile.typical_depth
-    else:
-        default_width = 1.0
-        default_depth = 1.0
-
     with col1:
         width = st.number_input(f"Joint Width ({selected_unit})", 
-                              min_value=0.1, 
+                              min_value=0.0, 
                               value=float(default_width),
+                              step=0.1 if selected_unit == "cm" else 1.0,
                               help=f"Enter the width of the joint in {selected_unit}")
 
     with col2:
         depth = st.number_input(f"Joint Depth ({selected_unit})", 
-                              min_value=0.1,
+                              min_value=0.0,
                               value=float(default_depth),
+                              step=0.1 if selected_unit == "cm" else 1.0,
                               help=f"Enter the depth of the joint in {selected_unit}")
 
     with col3:
@@ -285,12 +288,6 @@ with left_col:
     if validation["warnings"]:
         st.warning("⚠️ " + "\n".join(validation["warnings"]))
     
-    # Initialize session state for width and depth if not exists
-    if 'width' not in st.session_state:
-        st.session_state.width = width
-    if 'depth' not in st.session_state:
-        st.session_state.depth = depth
-
     # Create two columns for recommendation buttons
     rec_col1, rec_col2 = st.columns(2)
     

@@ -16,29 +16,29 @@ JOINT_PROFILES = {
     "Square Joint": JointProfile(
         name="Square Joint",
         typical_width=1.0,
-        typical_depth=1.0,
-        description="Standard square profile, equal width and depth",
+        typical_depth=0.5,  # Following 2:1 ratio
+        description="Standard square profile, width twice the depth",
         diagram_path="assets/square_joint.png",
         formula="Volume (L) = Width (cm) × Depth (cm) × Length (m) × 100 ÷ 1000",
-        notes="Most common profile. Use backing rod if depth > 10mm. Length is in meters, width/depth in cm."
+        notes="Most common profile. Use backing rod if depth > 10mm. Ideal width-to-depth ratio is 2:1."
     ),
     "Deep Joint": JointProfile(
         name="Deep Joint",
         typical_width=1.0,
-        typical_depth=2.0,
-        description="Deep profile, depth greater than width",
+        typical_depth=1.0,  # Equal width and depth
+        description="Deep profile, equal width and depth (1:1 ratio)",
         diagram_path="assets/deep_joint.png",
-        formula="Volume (L) = Width (cm) × Depth (cm) × Length (m) × 100 ÷ 1000\nRecommended: Depth = Width × 2",
-        notes="Requires backing rod. Add 10% for material settling. Length is in meters, width/depth in cm."
+        formula="Volume (L) = Width (cm) × Depth (cm) × Length (m) × 100 ÷ 1000",
+        notes="Requires backing rod. Ideal for joints with limited width but requiring good depth."
     ),
     "Wide Joint": JointProfile(
         name="Wide Joint",
         typical_width=2.0,
-        typical_depth=1.0,
-        description="Wide profile, width greater than depth",
+        typical_depth=1.0,  # Following 2:1 ratio
+        description="Wide profile, width twice the depth (2:1 ratio)",
         diagram_path="assets/wide_joint.png",
-        formula="Volume (L) = Width (cm) × Depth (cm) × Length (m) × 100 ÷ 1000\nRecommended: Depth = Width ÷ 2",
-        notes="May require multiple passes. Consider joint movement. Length is in meters, width/depth in cm."
+        formula="Volume (L) = Width (cm) × Depth (cm) × Length (m) × 100 ÷ 1000",
+        notes="May require multiple passes. Depth should not exceed width for proper adhesion."
     ),
     "V-Joint": JointProfile(
         name="V-Joint",
@@ -117,18 +117,18 @@ class JointValidator:
         "Deep Joint": {
             "width_to_depth_ratio": 1.0,  # 1:1 ratio for deep joints
             "min_width_mm": 6,
-            "max_width_mm": 20,
-            "min_depth_mm": 8,
-            "max_depth_mm": 15,  # Deeper than standard
+            "max_width_mm": 12,  # Typically narrower than square joints
+            "min_depth_mm": 6,
+            "max_depth_mm": 12,
             "ratio_tolerance": 0.2
         },
         "Wide Joint": {
-            "width_to_depth_ratio": 3.0,  # 3:1 ratio for wide joints
+            "width_to_depth_ratio": 2.0,  # 2:1 ratio (width:depth)
             "min_width_mm": 12,
-            "max_width_mm": 30,  # Wider than standard
+            "max_width_mm": 24,
             "min_depth_mm": 6,
-            "max_depth_mm": 10,
-            "ratio_tolerance": 0.3
+            "max_depth_mm": 12,
+            "ratio_tolerance": 0.3  # More tolerance for wide joints
         },
         "V-Joint": {
             "width_to_depth_ratio": 1.5,  # Less deep due to V shape
