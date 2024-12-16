@@ -98,21 +98,73 @@ class UnitConverter:
         return value  # cm
 
 class JointValidator:
-    MIN_DEPTH_MM = 6  # minimum 6mm depth
-    MAX_DEPTH_MM = 12  # maximum 12mm depth
-    MIN_WIDTH_MM = 6  # minimum 6mm width
-    MAX_WIDTH_MM = 24  # maximum 24mm width
+    # Common limits
+    MIN_DEPTH_MM = 6
+    MAX_DEPTH_MM = 12
+    MIN_WIDTH_MM = 6
+    MAX_WIDTH_MM = 24
+
+    # Profile-specific ratios and limits
+    PROFILE_SPECS = {
+        "Square Joint": {
+            "width_to_depth_ratio": 2.0,  # Standard 2:1 ratio
+            "min_width_mm": 6,
+            "max_width_mm": 24,
+            "min_depth_mm": 6,
+            "max_depth_mm": 12,
+            "ratio_tolerance": 0.2  # 20% tolerance
+        },
+        "Deep Joint": {
+            "width_to_depth_ratio": 1.0,  # 1:1 ratio for deep joints
+            "min_width_mm": 6,
+            "max_width_mm": 20,
+            "min_depth_mm": 8,
+            "max_depth_mm": 15,  # Deeper than standard
+            "ratio_tolerance": 0.2
+        },
+        "Wide Joint": {
+            "width_to_depth_ratio": 3.0,  # 3:1 ratio for wide joints
+            "min_width_mm": 12,
+            "max_width_mm": 30,  # Wider than standard
+            "min_depth_mm": 6,
+            "max_depth_mm": 10,
+            "ratio_tolerance": 0.3
+        },
+        "V-Joint": {
+            "width_to_depth_ratio": 1.5,  # Less deep due to V shape
+            "min_width_mm": 6,
+            "max_width_mm": 20,
+            "min_depth_mm": 6,
+            "max_depth_mm": 12,
+            "ratio_tolerance": 0.25
+        },
+        "U-Joint": {
+            "width_to_depth_ratio": 1.5,  # Similar to V-joint
+            "min_width_mm": 8,
+            "max_width_mm": 24,
+            "min_depth_mm": 8,
+            "max_depth_mm": 15,
+            "ratio_tolerance": 0.25
+        }
+    }
     
     @staticmethod
-    def get_recommended_depth(width_mm: float) -> float:
-        """Calculate recommended depth based on width (2:1 ratio)."""
-        recommended = width_mm / 2
-        return max(JointValidator.MIN_DEPTH_MM, 
-                  min(recommended, JointValidator.MAX_DEPTH_MM))
+    def get_profile_specs(profile_name: str) -> dict:
+        """Get specifications for a specific joint profile."""
+        return JointValidator.PROFILE_SPECS.get(profile_name, JointValidator.PROFILE_SPECS["Square Joint"])
     
     @staticmethod
-    def validate_dimensions(width_mm: float, depth_mm: float) -> dict:
-        """Validate joint dimensions and return status with messages."""
+    def get_recommended_depth(width_mm: float, profile_name: str) -> float:
+        """Calculate recommended depth based on width and profile type."""
+        specs = JointValidator.get_profile_specs(profile_name)
+        recommended = width_mm / specs["width_to_depth_ratio"]
+        return max(specs["min_depth_mm"], 
+                  min(recommended, specs["max_depth_mm"]))
+    
+    @staticmethod
+    def validate_dimensions(width_mm: float, depth_mm: float, profile_name: str) -> dict:
+        """Validate joint dimensions based on profile type."""
+        specs = JointValidator.get_profile_specs(profile_name)
         status = {
             "is_valid": True,
             "warnings": [],
@@ -120,32 +172,51 @@ class JointValidator:
         }
         
         # Check width limits
-        if width_mm < JointValidator.MIN_WIDTH_MM:
-            status["warnings"].append(f"Width ({width_mm}mm) is below minimum recommended width ({JointValidator.MIN_WIDTH_MM}mm)")
+        if width_mm < specs["min_width_mm"]:
+            status["warnings"].append(
+                f"Width ({width_mm}mm) is below minimum recommended width "
+                f"({specs['min_width_mm']}mm) for {profile_name}"
+            )
             status["is_valid"] = False
-        elif width_mm > JointValidator.MAX_WIDTH_MM:
-            status["warnings"].append(f"Width ({width_mm}mm) exceeds maximum recommended width ({JointValidator.MAX_WIDTH_MM}mm)")
+        elif width_mm > specs["max_width_mm"]:
+            status["warnings"].append(
+                f"Width ({width_mm}mm) exceeds maximum recommended width "
+                f"({specs['max_width_mm']}mm) for {profile_name}"
+            )
             status["is_valid"] = False
             
         # Check depth limits
-        if depth_mm < JointValidator.MIN_DEPTH_MM:
-            status["warnings"].append(f"Depth ({depth_mm}mm) is below minimum recommended depth ({JointValidator.MIN_DEPTH_MM}mm)")
+        if depth_mm < specs["min_depth_mm"]:
+            status["warnings"].append(
+                f"Depth ({depth_mm}mm) is below minimum recommended depth "
+                f"({specs['min_depth_mm']}mm) for {profile_name}"
+            )
             status["is_valid"] = False
-        elif depth_mm > JointValidator.MAX_DEPTH_MM:
-            status["warnings"].append(f"Depth ({depth_mm}mm) exceeds maximum recommended depth ({JointValidator.MAX_DEPTH_MM}mm)")
+        elif depth_mm > specs["max_depth_mm"]:
+            status["warnings"].append(
+                f"Depth ({depth_mm}mm) exceeds maximum recommended depth "
+                f"({specs['max_depth_mm']}mm) for {profile_name}"
+            )
             status["is_valid"] = False
             
         # Check width-to-depth ratio
-        recommended_depth = JointValidator.get_recommended_depth(width_mm)
-        ratio = width_mm / depth_mm if depth_mm > 0 else float('inf')
+        recommended_depth = JointValidator.get_recommended_depth(width_mm, profile_name)
+        actual_ratio = width_mm / depth_mm if depth_mm > 0 else float('inf')
+        target_ratio = specs["width_to_depth_ratio"]
+        tolerance = specs["ratio_tolerance"] * target_ratio
         
-        if abs(depth_mm - recommended_depth) > 1:  # 1mm tolerance
+        if abs(actual_ratio - target_ratio) > tolerance:
             status["recommendations"].append(
-                f"Recommended depth for {width_mm}mm width is {recommended_depth}mm (2:1 width-to-depth ratio)"
+                f"For {profile_name}, recommended depth for {width_mm}mm width is {recommended_depth:.1f}mm "
+                f"({target_ratio}:1 width-to-depth ratio)"
             )
-            if ratio < 1.5:  # Too deep relative to width
-                status["warnings"].append("Joint is too deep relative to width. This may cause adhesion failure.")
-            elif ratio > 2.5:  # Too shallow relative to width
-                status["warnings"].append("Joint is too shallow relative to width. This may affect movement capability.")
+            if actual_ratio < target_ratio - tolerance:
+                status["warnings"].append(
+                    f"Joint is too deep for {profile_name}. This may cause adhesion failure."
+                )
+            elif actual_ratio > target_ratio + tolerance:
+                status["warnings"].append(
+                    f"Joint is too shallow for {profile_name}. This may affect movement capability."
+                )
                 
         return status

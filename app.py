@@ -125,11 +125,16 @@ with left_col:
 
     # Add joint specification guide
     with st.expander("Joint Specifications Guide"):
-        st.markdown("""
-        ### Joint Dimension Guidelines
-        - **Width Range**: 6mm - 24mm
-        - **Depth Range**: 6mm - 12mm
-        - **Ideal Ratio**: Width:Depth = 2:1
+        st.markdown(f"""
+        ### {profile_name} Specifications
+        """)
+        
+        specs = JointValidator.get_profile_specs(profile_name)
+        st.markdown(f"""
+        #### Recommended Dimensions
+        - **Width Range**: {specs['min_width_mm']}mm - {specs['max_width_mm']}mm
+        - **Depth Range**: {specs['min_depth_mm']}mm - {specs['max_depth_mm']}mm
+        - **Ideal Ratio**: Width:Depth = {specs['width_to_depth_ratio']}:1
         
         #### Why These Specifications Matter
         1. **Proper Movement**: Correct depth allows the sealant to flex properly
@@ -142,17 +147,20 @@ with left_col:
         st.markdown("### Visual Guide: Ideal Joint Ratio")
         col1, col2 = st.columns([1, 1])
         
+        ideal_width = (specs['min_width_mm'] + specs['max_width_mm']) / 2
+        ideal_depth = ideal_width / specs['width_to_depth_ratio']
+        
         with col1:
-            st.markdown("""
+            st.markdown(f"""
             ```
-            Correct (2:1 Ratio)
+            Correct ({specs['width_to_depth_ratio']}:1 Ratio)
             
             ┌──────────────┐
             │              │
-            │   Width      │ 20mm
+            │   Width      │ {ideal_width:.0f}mm
             │    ↔         │
             │              │
-            │   Depth      │ 10mm
+            │   Depth      │ {ideal_depth:.0f}mm
             │    ↕         │
             └──────────────┘
             ```
@@ -161,16 +169,16 @@ with left_col:
             """)
             
         with col2:
-            st.markdown("""
+            st.markdown(f"""
             ```
             Incorrect (1:1 Ratio)
             
             ┌──────────────┐
             │              │
-            │   Width      │ 20mm
+            │   Width      │ {ideal_width:.0f}mm
             │    ↔         │
             │              │
-            │   Depth      │ 20mm
+            │   Depth      │ {ideal_width:.0f}mm
             │    ↕         │
             └──────────────┘
             ```
@@ -182,8 +190,8 @@ with left_col:
     width_mm = UnitConverter.cm_to_mm(width_cm)
     depth_mm = UnitConverter.cm_to_mm(depth_cm)
     
-    # Validate dimensions
-    validation = JointValidator.validate_dimensions(width_mm, depth_mm)
+    # Validate dimensions with profile
+    validation = JointValidator.validate_dimensions(width_mm, depth_mm, profile_name)
     
     # Show recommendations before calculation
     if validation["recommendations"]:
@@ -194,7 +202,7 @@ with left_col:
         st.warning("⚠️ " + "\n".join(validation["warnings"]))
         
     # Auto-suggest depth based on width
-    recommended_depth_mm = JointValidator.get_recommended_depth(width_mm)
+    recommended_depth_mm = JointValidator.get_recommended_depth(width_mm, profile_name)
     if st.button("Use Recommended Depth"):
         if selected_unit == "mm":
             depth = recommended_depth_mm
