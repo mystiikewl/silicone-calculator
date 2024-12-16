@@ -285,21 +285,16 @@ with left_col:
     if validation["warnings"]:
         st.warning("⚠️ " + "\n".join(validation["warnings"]))
     
+    # Initialize session state for width and depth if not exists
+    if 'width' not in st.session_state:
+        st.session_state.width = width
+    if 'depth' not in st.session_state:
+        st.session_state.depth = depth
+
     # Create two columns for recommendation buttons
     rec_col1, rec_col2 = st.columns(2)
     
     with rec_col1:
-        if recommendations["recommended_depth"] is not None:
-            recommended_value = (
-                UnitConverter.mm_to_cm(recommendations["recommended_depth"]) 
-                if selected_unit == "cm" 
-                else recommendations["recommended_depth"]
-            )
-            if st.button(f"Use Recommended Depth ({recommended_value:.1f} {selected_unit})"):
-                st.session_state.depth = recommended_value
-                st.experimental_rerun()
-    
-    with rec_col2:
         if recommendations["recommended_width"] is not None:
             recommended_value = (
                 UnitConverter.mm_to_cm(recommendations["recommended_width"]) 
@@ -308,6 +303,17 @@ with left_col:
             )
             if st.button(f"Use Recommended Width ({recommended_value:.1f} {selected_unit})"):
                 st.session_state.width = recommended_value
+                st.experimental_rerun()
+    
+    with rec_col2:
+        if recommendations["recommended_depth"] is not None:
+            recommended_value = (
+                UnitConverter.mm_to_cm(recommendations["recommended_depth"]) 
+                if selected_unit == "cm" 
+                else recommendations["recommended_depth"]
+            )
+            if st.button(f"Use Recommended Depth ({recommended_value:.1f} {selected_unit})"):
+                st.session_state.depth = recommended_value
                 st.experimental_rerun()
 
     # Wastage checkbox

@@ -227,11 +227,20 @@ class JointValidator:
 
         # Check width-to-depth ratio
         actual_ratio = width / depth if depth != 0 else float('inf')
-        if abs(actual_ratio - specs["width_to_depth_ratio"]) > specs.get("ratio_tolerance", 0.5):
-            if actual_ratio > specs["width_to_depth_ratio"]:
-                warnings.append(f"Joint is too shallow for {profile_name}. This may cause adhesion failure.")
-            else:
-                warnings.append(f"Joint is too deep for {profile_name}. This may cause adhesion failure.")
+        target_ratio = specs["width_to_depth_ratio"]
+        tolerance = specs.get("ratio_tolerance", 0.5)
+        
+        # For Wide Joint, we mainly care if depth is greater than width
+        if profile_name == "Wide Joint":
+            if depth > width:
+                warnings.append(f"Depth should not exceed width for {profile_name}. This may cause adhesion failure.")
+        else:
+            # For other profiles, check the specific ratio requirements
+            if abs(actual_ratio - target_ratio) > tolerance:
+                if actual_ratio > target_ratio + tolerance:
+                    warnings.append(f"Joint is too shallow for {profile_name}. This may affect movement capability.")
+                elif actual_ratio < target_ratio - tolerance:
+                    warnings.append(f"Joint is too deep for {profile_name}. This may cause adhesion failure.")
 
         # Add recommendation for ideal ratio
         if width > 0:
