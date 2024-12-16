@@ -130,17 +130,66 @@ with left_col:
         """)
         
         specs = JointValidator.get_profile_specs(profile_name)
+        
+        # Profile-specific descriptions
+        profile_descriptions = {
+            "Square Joint": "Standard profile with equal sides, ideal for most applications. Uses the common 2:1 width-to-depth ratio.",
+            "Deep Joint": "Specialized profile for gaps requiring extra depth. Uses 1:1 ratio to ensure proper curing and adhesion.",
+            "Wide Joint": "Designed for wide gaps, using 3:1 ratio to maintain flexibility while covering larger areas.",
+            "V-Joint": "Angular profile for corner applications, using 1.5:1 ratio to account for the V-shaped gap.",
+            "U-Joint": "Rounded profile with 1.5:1 ratio, ideal for curved or rounded gap applications."
+        }
+        
         st.markdown(f"""
-        #### Recommended Dimensions
+        #### Profile Description
+        {profile_descriptions.get(profile_name, "Custom profile for specific requirements.")}
+        
+        #### Joint Dimension Guidelines
         - **Width Range**: {specs['min_width_mm']}mm - {specs['max_width_mm']}mm
         - **Depth Range**: {specs['min_depth_mm']}mm - {specs['max_depth_mm']}mm
         - **Ideal Ratio**: Width:Depth = {specs['width_to_depth_ratio']}:1
+        - **Tolerance**: ±{int(specs['ratio_tolerance']*100)}% from ideal ratio
+        
+        #### Profile-Specific Considerations
+        1. **Movement Capability**: {
+            "Excellent" if specs['width_to_depth_ratio'] >= 2 else 
+            "Good" if specs['width_to_depth_ratio'] >= 1.5 else 
+            "Moderate"} flexibility
+        2. **Material Usage**: {
+            "Efficient" if specs['width_to_depth_ratio'] >= 2 else 
+            "Moderate" if specs['width_to_depth_ratio'] >= 1.5 else 
+            "Higher"} material consumption
+        3. **Application Complexity**: {
+            "Simple" if profile_name == "Square Joint" else
+            "Moderate" if profile_name in ["V-Joint", "Wide Joint"] else
+            "Complex"} installation process
+        4. **Typical Applications**:
+           - {
+            "General purpose sealing" if profile_name == "Square Joint" else
+            "Deep gap filling" if profile_name == "Deep Joint" else
+            "Large expansion joints" if profile_name == "Wide Joint" else
+            "Corner joints and angles" if profile_name == "V-Joint" else
+            "Curved surfaces and rounded gaps" if profile_name == "U-Joint" else
+            "Custom applications"}
+           - {
+            "Interior and exterior use" if profile_name == "Square Joint" else
+            "Structural joints" if profile_name == "Deep Joint" else
+            "Facade joints" if profile_name == "Wide Joint" else
+            "Wall-floor junctions" if profile_name == "V-Joint" else
+            "Pipe penetrations" if profile_name == "U-Joint" else
+            "Specialized uses"}
         
         #### Why These Specifications Matter
-        1. **Proper Movement**: Correct depth allows the sealant to flex properly
-        2. **Material Efficiency**: Optimal depth reduces material waste
-        3. **Better Adhesion**: Prevents three-sided adhesion which can cause failure
-        4. **Durability**: Correct ratio ensures long-term performance
+        1. **Proper Movement**: {
+            "Optimal flexibility for standard movement" if profile_name == "Square Joint" else
+            "Enhanced depth for structural movement" if profile_name == "Deep Joint" else
+            "Maximum coverage with maintained flexibility" if profile_name == "Wide Joint" else
+            "Angular movement accommodation" if profile_name == "V-Joint" else
+            "Rounded movement capability" if profile_name == "U-Joint" else
+            "Custom movement requirements"}
+        2. **Material Efficiency**: Dimensions optimized for {specs['width_to_depth_ratio']}:1 ratio
+        3. **Better Adhesion**: Profile design prevents three-sided adhesion
+        4. **Durability**: Specifications ensure long-term performance
         """)
         
         # Visual representation using columns
