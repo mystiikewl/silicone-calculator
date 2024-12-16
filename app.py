@@ -138,7 +138,45 @@ with left_col:
         4. **Durability**: Correct ratio ensures long-term performance
         """)
         
-        st.image("assets/joint_ratio_diagram.png", caption="Ideal Joint Ratio Diagram", use_column_width=True)
+        # Visual representation using columns
+        st.markdown("### Visual Guide: Ideal Joint Ratio")
+        col1, col2 = st.columns([1, 1])
+        
+        with col1:
+            st.markdown("""
+            ```
+            Correct (2:1 Ratio)
+            
+            ┌──────────────┐
+            │              │
+            │   Width      │ 20mm
+            │    ↔         │
+            │              │
+            │   Depth      │ 10mm
+            │    ↕         │
+            └──────────────┘
+            ```
+            ✅ Proper movement
+            ✅ Good adhesion
+            """)
+            
+        with col2:
+            st.markdown("""
+            ```
+            Incorrect (1:1 Ratio)
+            
+            ┌──────────────┐
+            │              │
+            │   Width      │ 20mm
+            │    ↔         │
+            │              │
+            │   Depth      │ 20mm
+            │    ↕         │
+            └──────────────┘
+            ```
+            ❌ Limited movement
+            ❌ Risk of adhesion failure
+            """)
 
     # Convert measurements for validation
     width_mm = UnitConverter.cm_to_mm(width_cm)
