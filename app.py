@@ -70,9 +70,9 @@ with left_col:
         list(JOINT_PROFILES.keys()) + ["Custom"]
     )
 
-    # Unit selection
-    unit_options = ["mm", "cm", "m"]
-    selected_unit = st.selectbox("Select measurement unit", unit_options, index=1)
+    # Unit selection for width and depth
+    unit_options = ["mm", "cm"]
+    selected_unit = st.selectbox("Width/Depth Unit:", unit_options, index=1)
 
     # Input fields with unit conversion
     st.subheader("2. Enter Measurements")
@@ -84,38 +84,26 @@ with left_col:
         default_width = profile.typical_width
         default_depth = profile.typical_depth
     else:
-        default_width = 0.5
-        default_depth = 0.5
+        default_width = 1.0
+        default_depth = 1.0
 
     with col1:
-        width = st.number_input(
-            f"Joint width ({selected_unit})", 
-            min_value=0.1, 
-            value=UnitConverter.convert(default_width, "cm", selected_unit),
-            step=0.1,
-            format="%.1f",
-            help="The width of the joint to be sealed"
-        )
+        width = st.number_input(f"Joint Width ({selected_unit})", 
+                              min_value=0.1, 
+                              value=float(default_width),
+                              help=f"Enter the width of the joint in {selected_unit}")
 
     with col2:
-        depth = st.number_input(
-            f"Joint depth ({selected_unit})", 
-            min_value=0.1, 
-            value=UnitConverter.convert(default_depth, "cm", selected_unit),
-            step=0.1,
-            format="%.1f",
-            help="The depth of the joint to be sealed"
-        )
+        depth = st.number_input(f"Joint Depth ({selected_unit})", 
+                              min_value=0.1,
+                              value=float(default_depth),
+                              help=f"Enter the depth of the joint in {selected_unit}")
 
     with col3:
-        length = st.number_input(
-            f"Joint length ({selected_unit})", 
-            min_value=0.1, 
-            value=UnitConverter.convert(100.0, "cm", selected_unit),
-            step=0.1,
-            format="%.1f",
-            help="The length of the joint to be sealed"
-        )
+        length = st.number_input("Joint Length (m)",
+                               min_value=0.1,
+                               value=1.0,
+                               help="Enter the length of the joint in meters")
 
     with col4:
         package_type = st.selectbox(
@@ -124,10 +112,16 @@ with left_col:
             help="Select the type of sealant package you plan to use"
         )
 
-    # Convert all measurements to cm for calculation
-    width_cm = UnitConverter.convert(width, selected_unit, "cm")
-    depth_cm = UnitConverter.convert(depth, selected_unit, "cm")
-    length_cm = UnitConverter.convert(length, selected_unit, "cm")
+    # Convert width and depth to cm for calculations
+    if selected_unit == "mm":
+        width_cm = UnitConverter.mm_to_cm(width)
+        depth_cm = UnitConverter.mm_to_cm(depth)
+    else:  # cm
+        width_cm = width
+        depth_cm = depth
+
+    # Length is already in meters, convert to cm for volume calculation
+    length_cm = UnitConverter.m_to_cm(length)
 
     # Wastage checkbox
     allow_wastage = st.checkbox("Allow 15% wastage", value=True,
