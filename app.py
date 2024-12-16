@@ -128,11 +128,13 @@ with left_col:
 
     # Add joint specification guide
     with st.expander("Joint Specifications Guide"):
+        # Get the current profile's specifications
+        profile_specs = JointValidator.get_profile_specs(profile_name)
+        
+        # Display the specifications
         st.markdown(f"""
         ### {profile_name} Specifications
         """)
-        
-        specs = JointValidator.get_profile_specs(profile_name)
         
         # Profile-specific descriptions
         profile_descriptions = {
@@ -148,19 +150,19 @@ with left_col:
         {profile_descriptions.get(profile_name, "Custom profile for specific requirements.")}
         
         #### Joint Dimension Guidelines
-        - **Width Range**: {specs['min_width_mm']}mm - {specs['max_width_mm']}mm
-        - **Depth Range**: {specs['min_depth_mm']}mm - {specs['max_depth_mm']}mm
-        - **Ideal Ratio**: Width:Depth = {specs['width_to_depth_ratio']}:1
-        - **Tolerance**: ±{int(specs['ratio_tolerance']*100)}% from ideal ratio
+        - **Width Range**: {profile_specs['min_width_mm']}mm - {profile_specs['max_width_mm']}mm
+        - **Depth Range**: {profile_specs['min_depth_mm']}mm - {profile_specs['max_depth_mm']}mm
+        - **Ideal Ratio**: Width:Depth = {profile_specs['width_to_depth_ratio']}:1
+        - **Tolerance**: ±{int(profile_specs['ratio_tolerance']*100)}% from ideal ratio
         
         #### Profile-Specific Considerations
         1. **Movement Capability**: {
-            "Excellent" if specs['width_to_depth_ratio'] >= 2 else 
-            "Good" if specs['width_to_depth_ratio'] >= 1.5 else 
+            "Excellent" if profile_specs['width_to_depth_ratio'] >= 2 else 
+            "Good" if profile_specs['width_to_depth_ratio'] >= 1.5 else 
             "Moderate"} flexibility
         2. **Material Usage**: {
-            "Efficient" if specs['width_to_depth_ratio'] >= 2 else 
-            "Moderate" if specs['width_to_depth_ratio'] >= 1.5 else 
+            "Efficient" if profile_specs['width_to_depth_ratio'] >= 2 else 
+            "Moderate" if profile_specs['width_to_depth_ratio'] >= 1.5 else 
             "Higher"} material consumption
         3. **Application Complexity**: {
             "Simple" if profile_name == "Square Joint" else
@@ -190,7 +192,7 @@ with left_col:
             "Angular movement accommodation" if profile_name == "V-Joint" else
             "Rounded movement capability" if profile_name == "U-Joint" else
             "Custom movement requirements"}
-        2. **Material Efficiency**: Dimensions optimized for {specs['width_to_depth_ratio']}:1 ratio
+        2. **Material Efficiency**: Dimensions optimized for {profile_specs['width_to_depth_ratio']}:1 ratio
         3. **Better Adhesion**: Profile design prevents three-sided adhesion
         4. **Durability**: Specifications ensure long-term performance
         """)
@@ -199,13 +201,13 @@ with left_col:
         st.markdown("### Visual Guide: Ideal Joint Ratio")
         col1, col2 = st.columns([1, 1])
         
-        ideal_width = (specs['min_width_mm'] + specs['max_width_mm']) / 2
-        ideal_depth = ideal_width / specs['width_to_depth_ratio']
+        ideal_width = (profile_specs['min_width_mm'] + profile_specs['max_width_mm']) / 2
+        ideal_depth = ideal_width / profile_specs['width_to_depth_ratio']
         
         with col1:
             st.markdown(f"""
             ```
-            Correct ({specs['width_to_depth_ratio']}:1 Ratio)
+            Correct ({profile_specs['width_to_depth_ratio']}:1 Ratio)
             
             ┌──────────────┐
             │              │

@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 from typing import Dict, Any
+from pathlib import Path
+from knowledge_framework.documentation.doc_manager import DocumentationManager
 
 @dataclass
 class JointProfile:
@@ -10,6 +12,12 @@ class JointProfile:
     diagram_path: str
     formula: str
     notes: str = ""
+    
+    @staticmethod
+    def get_specifications() -> str:
+        """Get detailed joint specifications from documentation."""
+        doc_manager = DocumentationManager(Path(__file__).parent.parent)
+        return doc_manager.get_joint_specifications()
 
 # Define common joint profiles
 JOINT_PROFILES = {
@@ -17,7 +25,7 @@ JOINT_PROFILES = {
         name="Square Joint",
         typical_width=1.0,
         typical_depth=0.5,  # Following 2:1 ratio
-        description="Standard square profile, width twice the depth",
+        description="Standard square profile, width twice the depth (2:1 ratio)",
         diagram_path="assets/square_joint.png",
         formula="Volume (L) = Width (cm) × Depth (cm) × Length (m) × 100 ÷ 1000",
         notes="Most common profile. Use backing rod if depth > 10mm. Ideal width-to-depth ratio is 2:1."
@@ -42,21 +50,66 @@ JOINT_PROFILES = {
     ),
     "V-Joint": JointProfile(
         name="V-Joint",
-        typical_width=1.0,
-        typical_depth=1.5,
-        description="V-shaped profile, commonly used in corners",
+        typical_width=1.5,
+        typical_depth=1.0,  # Following 1.5:1 ratio
+        description="V-shaped profile for corner applications (1.5:1 ratio)",
         diagram_path="assets/v_joint.png",
-        formula="Volume (L) = (Width (cm) × Depth (cm) × Length (m) × 100) ÷ 2000",
-        notes="Use half of square joint volume due to triangular profile. Length is in meters, width/depth in cm."
+        formula="Volume (L) = Width (cm) × Depth (cm) × Length (m) × 100 ÷ 2000",  # Half volume due to triangular profile
+        notes="Ideal for corner applications. Volume is half of square joint due to triangular profile."
     ),
     "U-Joint": JointProfile(
         name="U-Joint",
         typical_width=1.5,
-        typical_depth=1.5,
-        description="U-shaped profile, rounded bottom",
+        typical_depth=1.0,  # Following 1.5:1 ratio
+        description="U-shaped profile for enhanced movement (1.5:1 ratio)",
         diagram_path="assets/u_joint.png",
-        formula="Volume (L) = (π × Width (cm) × Depth (cm) × Length (m) × 100) ÷ 4000",
-        notes="Accounts for rounded bottom. Add 15% for curvature filling. Length is in meters, width/depth in cm."
+        formula="Volume (L) = Width (cm) × Depth (cm) × Length (m) × 100 ÷ 1000",
+        notes="Suitable for expansion joints. Requires special tooling for U-shape formation."
+    ),
+    "Square Joint": JointProfile(
+        name="Square Joint",
+        typical_width=1.0,
+        typical_depth=0.5,  # Following 2:1 ratio
+        description="Standard square profile, width twice the depth (2:1 ratio)",
+        diagram_path="assets/square_joint.png",
+        formula="Volume (L) = Width (cm) × Depth (cm) × Length (m) × 100 ÷ 1000",
+        notes="Most common profile. Use backing rod if depth > 10mm. Ideal width-to-depth ratio is 2:1."
+    ),
+    "Deep Joint": JointProfile(
+        name="Deep Joint",
+        typical_width=1.0,
+        typical_depth=1.0,  # Equal width and depth
+        description="Deep profile, equal width and depth (1:1 ratio)",
+        diagram_path="assets/deep_joint.png",
+        formula="Volume (L) = Width (cm) × Depth (cm) × Length (m) × 100 ÷ 1000",
+        notes="Requires backing rod. Ideal for joints with limited width but requiring good depth."
+    ),
+    "Wide Joint": JointProfile(
+        name="Wide Joint",
+        typical_width=2.0,
+        typical_depth=1.0,  # Following 2:1 ratio
+        description="Wide profile, width twice the depth (2:1 ratio)",
+        diagram_path="assets/wide_joint.png",
+        formula="Volume (L) = Width (cm) × Depth (cm) × Length (m) × 100 ÷ 1000",
+        notes="May require multiple passes. Depth should not exceed width for proper adhesion."
+    ),
+    "V-Joint": JointProfile(
+        name="V-Joint",
+        typical_width=1.5,
+        typical_depth=1.0,  # Following 1.5:1 ratio
+        description="V-shaped profile for corner applications (1.5:1 ratio)",
+        diagram_path="assets/v_joint.png",
+        formula="Volume (L) = Width (cm) × Depth (cm) × Length (m) × 100 ÷ 2000",  # Half volume due to triangular profile
+        notes="Ideal for corner applications. Volume is half of square joint due to triangular profile."
+    ),
+    "U-Joint": JointProfile(
+        name="U-Joint",
+        typical_width=1.5,
+        typical_depth=1.0,  # Following 1.5:1 ratio
+        description="U-shaped profile for enhanced movement (1.5:1 ratio)",
+        diagram_path="assets/u_joint.png",
+        formula="Volume (L) = Width (cm) × Depth (cm) × Length (m) × 100 ÷ 1000",
+        notes="Suitable for expansion joints. Requires special tooling for U-shape formation."
     )
 }
 
@@ -117,7 +170,7 @@ class JointValidator:
         "Deep Joint": {
             "width_to_depth_ratio": 1.0,  # 1:1 ratio for deep joints
             "min_width_mm": 6,
-            "max_width_mm": 12,  # Typically narrower than square joints
+            "max_width_mm": 12,
             "min_depth_mm": 6,
             "max_depth_mm": 12,
             "ratio_tolerance": 0.2
@@ -131,20 +184,22 @@ class JointValidator:
             "ratio_tolerance": 0.3  # More tolerance for wide joints
         },
         "V-Joint": {
-            "width_to_depth_ratio": 1.5,  # Less deep due to V shape
+            "width_to_depth_ratio": 1.5,  # 1.5:1 ratio for angular joints
             "min_width_mm": 6,
             "max_width_mm": 20,
             "min_depth_mm": 6,
             "max_depth_mm": 12,
-            "ratio_tolerance": 0.25
+            "ratio_tolerance": 0.25,
+            "volume_factor": 0.5  # Half volume due to triangular profile
         },
         "U-Joint": {
-            "width_to_depth_ratio": 1.5,  # Similar to V-joint
+            "width_to_depth_ratio": 1.5,  # 1.5:1 ratio for curved joints
             "min_width_mm": 8,
             "max_width_mm": 24,
             "min_depth_mm": 8,
             "max_depth_mm": 15,
-            "ratio_tolerance": 0.25
+            "ratio_tolerance": 0.25,
+            "curved_profile": True  # Indicates special volume consideration
         }
     }
     

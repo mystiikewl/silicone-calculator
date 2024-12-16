@@ -17,7 +17,7 @@ class DocumentationManager:
     
     def _initialize_structure(self) -> None:
         """Initialize documentation directory structure."""
-        directories = ['code', 'sessions', 'metrics', 'insights']
+        directories = ['code', 'sessions', 'metrics', 'insights', 'specifications']
         for dir_name in directories:
             (self.docs_path / dir_name).mkdir(parents=True, exist_ok=True)
     
@@ -97,6 +97,29 @@ class DocumentationManager:
             yaml.dump(documentation, f)
         
         return str(doc_path)
+
+    def get_joint_specifications(self) -> str:
+        """Get the joint specifications documentation content.
+        
+        Returns:
+            str: Content of the joint specifications documentation
+        """
+        specs_path = self.docs_path / 'specifications' / 'joint_profiles.md'
+        if not specs_path.exists():
+            return "Joint specifications documentation not found."
+        
+        with open(specs_path, 'r') as f:
+            return f.read()
+    
+    def update_joint_specifications(self, content: str) -> None:
+        """Update the joint specifications documentation.
+        
+        Args:
+            content (str): New content for the specifications
+        """
+        specs_path = self.docs_path / 'specifications' / 'joint_profiles.md'
+        with open(specs_path, 'w') as f:
+            f.write(content)
 
     def _calculate_metrics(self, generation_data: Dict[str, Any]) -> Dict[str, Any]:
         """Calculate metrics for the generation session."""
