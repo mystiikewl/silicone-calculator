@@ -162,6 +162,38 @@ class JointValidator:
                   min(recommended, specs["max_depth_mm"]))
     
     @staticmethod
+    def get_recommended_dimensions(width_mm: float = None, depth_mm: float = None, profile_name: str = "Square Joint") -> dict:
+        """Get recommended dimensions based on either width or depth."""
+        specs = JointValidator.get_profile_specs(profile_name)
+        result = {
+            "recommended_width": None,
+            "recommended_depth": None,
+            "based_on": None
+        }
+        
+        if width_mm is not None:
+            # Calculate depth based on width
+            recommended_depth = width_mm / specs["width_to_depth_ratio"]
+            recommended_depth = max(specs["min_depth_mm"], 
+                                 min(recommended_depth, specs["max_depth_mm"]))
+            result.update({
+                "recommended_depth": recommended_depth,
+                "based_on": "width"
+            })
+        
+        if depth_mm is not None:
+            # Calculate width based on depth
+            recommended_width = depth_mm * specs["width_to_depth_ratio"]
+            recommended_width = max(specs["min_width_mm"], 
+                                 min(recommended_width, specs["max_width_mm"]))
+            result.update({
+                "recommended_width": recommended_width,
+                "based_on": "depth"
+            })
+            
+        return result
+    
+    @staticmethod
     def validate_dimensions(width_mm: float, depth_mm: float, profile_name: str) -> dict:
         """Validate joint dimensions based on profile type."""
         specs = JointValidator.get_profile_specs(profile_name)

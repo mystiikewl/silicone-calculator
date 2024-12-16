@@ -239,6 +239,9 @@ with left_col:
     width_mm = UnitConverter.cm_to_mm(width_cm)
     depth_mm = UnitConverter.cm_to_mm(depth_cm)
     
+    # Get recommendations
+    recommendations = JointValidator.get_recommended_dimensions(width_mm=width_mm, depth_mm=depth_mm, profile_name=profile_name)
+    
     # Validate dimensions with profile
     validation = JointValidator.validate_dimensions(width_mm, depth_mm, profile_name)
     
@@ -249,14 +252,29 @@ with left_col:
     # Show warnings if dimensions are not ideal
     if validation["warnings"]:
         st.warning("⚠️ " + "\n".join(validation["warnings"]))
-        
-    # Auto-suggest depth based on width
-    recommended_depth_mm = JointValidator.get_recommended_depth(width_mm, profile_name)
-    if st.button("Use Recommended Depth"):
-        if selected_unit == "mm":
-            depth = recommended_depth_mm
-        else:  # cm
-            depth = UnitConverter.mm_to_cm(recommended_depth_mm)
+    
+    # Create two columns for recommendation buttons
+    rec_col1, rec_col2 = st.columns(2)
+    
+    with rec_col1:
+        if recommendations["recommended_depth"] is not None:
+            recommended_value = (
+                UnitConverter.mm_to_cm(recommendations["recommended_depth"]) 
+                if selected_unit == "cm" 
+                else recommendations["recommended_depth"]
+            )
+            if st.button(f"Use Recommended Depth ({recommended_value:.1f} {selected_unit})"):
+                depth = recommended_value
+    
+    with rec_col2:
+        if recommendations["recommended_width"] is not None:
+            recommended_value = (
+                UnitConverter.mm_to_cm(recommendations["recommended_width"]) 
+                if selected_unit == "cm" 
+                else recommendations["recommended_width"]
+            )
+            if st.button(f"Use Recommended Width ({recommended_value:.1f} {selected_unit})"):
+                width = recommended_value
 
     # Wastage checkbox
     allow_wastage = st.checkbox("Allow 15% wastage", value=True,
