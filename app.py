@@ -234,6 +234,38 @@ with left_col:
             ❌ Limited movement
             ❌ Risk of adhesion failure
             """)
+        
+        # Visual representation using columns
+        # st.markdown("### Visual Guide: Ideal Joint Ratio")
+        # col1, col2 = st.columns([1, 1])
+        
+        # with col1:
+        #     st.markdown("Correct (2:1 Ratio)")
+        #     st.code("""
+        # ┌─────────┐
+        # │         │
+        # │  Width  │ 13mm
+        # │    ↔    │
+        # │         │
+        # │  Depth  │ 6.5mm
+        # │    ↕    │
+        # └─────────┘
+        # """)
+        #     st.markdown("✅ Proper movement  ✅ Good adhesion")
+            
+        # with col2:
+        #     st.markdown("Incorrect (1:1 Ratio)")
+        #     st.code("""
+        # ┌─────────┐
+        # │         │
+        # │  Width  │ 13mm
+        # │    ↔    │
+        # │         │
+        # │  Depth  │ 13mm
+        # │    ↕    │
+        # └─────────┘
+        # """)
+        #     st.markdown("❌ Limited movement  ❌ Risk of adhesion failure")
 
     # Convert measurements for validation
     width_mm = UnitConverter.cm_to_mm(width_cm) if selected_unit == "cm" else width
