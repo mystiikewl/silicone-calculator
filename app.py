@@ -1,7 +1,7 @@
 import streamlit as st
 import pyshorteners
 from knowledge_integration import initialize_knowledge_system
-from utils.joint_profiles import JOINT_PROFILES, UnitConverter
+from utils.joint_profiles import JOINT_PROFILES, UnitConverter, JointValidator
 from utils.pdf_generator import generate_calculation_summary
 import os
 import tempfile
